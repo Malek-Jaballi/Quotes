@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quotes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Roboto&family=Amiri&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #fdfcfb, #e2d1c3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 4rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      animation: fadeIn 2s ease-in-out;
+      cursor: pointer;
+    }
+    p.slogan {
+      font-size: 1.2rem;
+      margin-bottom: 3rem;
+      color: #555;
+      animation: fadeIn 3s ease-in-out;
+      font-family: Arial, serif;
+      letter-spacing: 5px;
+    }
+    .buttons {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      animation: fadeIn 4s ease-in-out;
+    }
+    .btn {
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: background 0.3s;
+    }
+    .btn.arabic { background-color: #f67280; }
+    .btn.arabic:hover { background-color: #c06c84; }
+    .btn.english { background-color: #6c5b7b; }
+    .btn.english:hover { background-color: #355c7d; }
+    .btn.movie { background-color: #355c7d; }
+    .btn.movie:hover { background-color: #6c5b7b; }
+
+    .search-container {
+      margin-bottom: 3rem;
+      animation: fadeIn 5s ease-in-out;
+    }
+    #searchInput {
+      padding: 0.8rem 1rem;
+      width: 300px;
+      border: 2px solid #555;
+      border-radius: 30px;
+      outline: none;
+      font-size: 1rem;
+      transition: 0.3s ease;
+    }
+    #searchInput:focus {
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      border-color: #f67280;
+    }
+
+    .quotes-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .quote-box {
+      background: white;
+      border-left: 5px solid #f67280;
+      padding: 1.2rem;
+      width: 300px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      transition: transform 0.3s;
+      cursor: pointer;
+    }
+    .quote-box:hover {
+      transform: translateY(-5px);
+    }
+    .quote {
+      font-style: italic;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+    .author {
+      text-align: right;
+      font-weight: bold;
+      color: #777;
+    }
+    .arabic-font .quote, .arabic-font .author {
+      font-family: 'Amiri', serif;
+      direction: rtl;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+    .modal-content {
+      background: white;
+      padding: 5rem;
+      border-radius: 10px;
+      max-width: 80%;
+      text-align: center;
+      font-size: 1.5rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .modal-content .author {
+      margin-top: 1rem;
+      color: #555;
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 1rem;
+      text-align: center;
+      color: #666;
+      font-size: 0.9rem;
+      border-top: 1px solid #ccc;
+      width: 100%;
+      position: relative;
+      bottom: 0;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <h1 onclick="resetPage()">Quotes</h1>
+  <p class="slogan">Your place to think</p>
+  <div class="buttons">
+    <button class="btn arabic" onclick="showQuotes('arabic')">Arabic Quotes</button>
+    <button class="btn english" onclick="showQuotes('english')">English Quotes</button>
+    <button class="btn movie" onclick="showQuotes('movie')">Movie Quotes</button>
+  </div>
+
+
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search quotes, authors or movies..." oninput="searchQuotes()" />
+  </div>
+
+  <div id="quotes" class="quotes-container"></div>
+
+  <div id="quoteModal" class="modal" onclick="closeModal()">
+    <div class="modal-content" id="modalContent"></div>
+  </div>
+
+  <footer>© 2025 Malek</footer>
+  <script src="quotes.js"></script>
+  <script>
+
+    let currentQuotes = [];
+
+    function showQuotes(type) {
+      const container = document.getElementById('quotes');
+      container.innerHTML = '';
+      container.classList.toggle('arabic-font', type === 'arabic');
+      currentQuotes = quotesData[type];
+
+      currentQuotes.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'quote-box';
+        div.innerHTML = `<div class="quote">“${item.quote}”</div><div class="author">— ${item.author}</div>`;
+        div.addEventListener('click', () => showModal(item.quote, item.author, type));
+        container.appendChild(div);
+      });
+    }
+
+    function searchQuotes() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const container = document.getElementById('quotes');
+      container.innerHTML = '';
+      if (query === '') return;
+
+      let allQuotes = Object.values(quotesData).flat();
+      const matched = allQuotes.filter(item =>
+        item.quote.toLowerCase().includes(query) ||
+        item.author.toLowerCase().includes(query)
+      );
+
+      matched.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'quote-box';
+        const isArabic = quotesData.arabic.includes(item);
+        if (isArabic) container.classList.add('arabic-font');
+        else container.classList.remove('arabic-font');
+
+        div.innerHTML = `<div class="quote">“${item.quote}”</div><div class="author">— ${item.author}</div>`;
+        div.addEventListener('click', () => showModal(item.quote, item.author, isArabic ? 'arabic' : ''));
+        container.appendChild(div);
+      });
+    }
+
+    function showModal(quote, author, type) {
+      const modal = document.getElementById('quoteModal');
+      const content = document.getElementById('modalContent');
+      content.className = 'modal-content' + (type === 'arabic' ? ' arabic-font' : '');
+      content.innerHTML = `<div class="quote">“${quote}”</div><div class="author">— ${author}</div>`;
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('quoteModal').style.display = 'none';
+    }
+
+    function resetPage() {
+      document.getElementById('quotes').innerHTML = '';
+      document.getElementById('quotes').classList.remove('arabic-font');
+      document.getElementById('searchInput').value = '';
+      currentQuotes = [];
+    }
+  </script>
+</body>
+</html>
