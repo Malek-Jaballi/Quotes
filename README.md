@@ -22,7 +22,7 @@ Check it out here: (https://learningplacee.github.io/Quotes/)
 
 ## 📷 Screenshot
 
-![Screenshot](screenshot.png) <!-- You can upload a screenshot and reference it -->
+![Screenshot](Capture.png) <!-- You can upload a screenshot and reference it -->
 
 ## 📄 License
 
